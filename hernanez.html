@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Clientzone | Client Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#080e1b;
+--panel:#111b2e;
+--panel2:#17243b;
+--cyan:#35d5e8;
+--purple:#947aff;
+--text:#f5f7ff;
+--muted:#8b9ab2;
+--border:#293954;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+background:var(--bg);
+color:var(--text);
+font-family:Inter,Arial,sans-serif;
+min-height:100vh;
+}
+button,input{font-family:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* AUTH */
+.auth{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+background:
+radial-gradient(circle at 15% 15%,#19365b 0,transparent 38%),
+radial-gradient(circle at 90% 90%,#302455 0,transparent 40%),
+var(--bg);
+}
+.auth-card{
+width:100%;
+max-width:430px;
+padding:38px;
+border:1px solid var(--border);
+background:rgba(17,27,46,.96);
+border-radius:22px;
+box-shadow:0 25px 80px #0009;
+}
+.logo{
+font-size:29px;
+font-weight:800;
+letter-spacing:2px;
+background:linear-gradient(90deg,var(--cyan),var(--purple));
+background-clip:text;
+color:transparent;
+}
+.logo-sub{
+font-size:10px;
+letter-spacing:4px;
+color:var(--muted);
+margin-top:7px;
+}
+.auth-card h2{margin-top:30px;font-size:25px}
+.desc{color:var(--muted);font-size:13px;margin:10px 0 25px}
+label{
+display:block;
+font-size:12px;
+margin:16px 0 8px;
+color:#bdc9dd;
+}
+input{
+width:100%;
+padding:15px;
+border:1px solid var(--border);
+background:#0b1527;
+color:white;
+border-radius:10px;
+outline:none;
+}
+input:focus{border-color:var(--cyan)}
+.primary{
+width:100%;
+padding:15px;
+margin-top:23px;
+border:0;
+border-radius:10px;
+background:linear-gradient(100deg,var(--cyan),var(--purple));
+font-weight:800;
+color:#07121d;
+}
+.switch{
+text-align:center;
+color:var(--cyan);
+font-size:12px;
+margin-top:22px;
+cursor:pointer;
+}
+.error{font-size:12px;color:#ff8585;margin-top:12px}
+.note{text-align:center;color:#697991;font-size:10px;margin-top:25px}
+
+/* HEADER */
+header{
+height:75px;
+background:#0e1829;
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 5%;
+position:sticky;
+top:0;
+z-index:5;
+}
+.header-right{display:flex;align-items:center;gap:12px}
+.profile{
+padding:10px 15px;
+border-radius:30px;
+background:var(--panel2);
+border:1px solid var(--border);
+font-size:11px;
+}
+.logout{
+background:#23324b;
+border:1px solid var(--border);
+color:white;
+padding:10px 15px;
+border-radius:9px;
+}
+.container{max-width:1250px;margin:auto;padding:35px 22px}
+.welcome{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:20px;
+margin-bottom:27px;
+}
+.welcome h1{font-size:27px}
+.welcome p{font-size:13px;color:var(--muted);margin-top:8px}
+.client-id{
+margin-top:17px;
+display:inline-flex;
+flex-direction:column;
+gap:6px;
+padding:12px 20px;
+background:#111d31;
+border:1px solid var(--cyan);
+border-radius:11px;
+}
+.client-id small{color:var(--muted);font-size:10px;letter-spacing:2px}
+.client-id strong{color:var(--cyan);font-size:21px;letter-spacing:2px}
+.account-status{
+background:#30251e;
+color:#ffbd82;
+padding:10px 15px;
+border-radius:9px;
+font-size:11px;
+}
+
+/* CARDS */
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:18px;
+}
+.stat{
+background:linear-gradient(145deg,#17243c,#101a2c);
+border:1px solid var(--border);
+border-radius:16px;
+padding:25px;
+position:relative;
+overflow:hidden;
+}
+.stat:after{
+content:"";
+position:absolute;
+width:100px;height:100px;
+right:-30px;top:-30px;
+background:var(--cyan);
+opacity:.06;
+border-radius:50%;
+}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-value{font-size:27px;font-weight:800;margin-top:17px}
+.stat-info{font-size:11px;color:var(--muted);margin-top:10px}
+.cyan{color:var(--cyan)}
+.purple{color:var(--purple)}
+
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin:23px 0;
+}
+.action{
+padding:17px;
+border-radius:11px;
+font-weight:800;
+font-size:13px;
+}
+.deposit{
+background:linear-gradient(100deg,var(--cyan),#829bff);
+color:#07121d;
+border:0;
+}
+.withdraw{
+background:#18263d;
+color:white;
+border:1px solid #3a4d6b;
+}
+
+/* CONTENT */
+.content{
+display:grid;
+grid-template-columns:1.5fr 1fr;
+gap:18px;
+margin-top:22px;
+}
+.panel{
+background:var(--panel);
+border:1px solid var(--border);
+padding:24px;
+border-radius:16px;
+min-width:0;
+}
+.panel h3{font-size:15px;margin-bottom:20px}
+.chart-area{height:270px}
+.modules{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:13px;
+}
+.module{
+background:#0c1628;
+border:1px solid var(--border);
+padding:17px;
+border-radius:12px;
+}
+.module-icon{font-size:25px;margin-bottom:15px}
+.module h4{font-size:13px}
+.module p{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
+.inactive{
+display:inline-block;
+margin-top:14px;
+padding:7px 9px;
+background:#392b25;
+color:#ffb28b;
+border-radius:6px;
+font-size:9px;
+font-weight:800;
+letter-spacing:1px;
+}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:400px}
+th,td{
+padding:15px 10px;
+text-align:left;
+border-bottom:1px solid var(--border);
+font-size:12px;
+}
+th{color:var(--muted)}
+.sample{color:var(--cyan)}
+footer{
+text-align:center;
+padding:35px;
+color:#697991;
+font-size:11px;
+}
+
+/* MODAL */
+.modal{
+display:none;
+position:fixed;
+inset:0;
+z-index:20;
+background:#020611dc;
+align-items:center;
+justify-content:center;
+padding:20px;
+}
+.modal-card{
+width:100%;
+max-width:420px;
+padding:30px;
+border-radius:18px;
+background:#142038;
+border:1px solid #3a4c69;
+text-align:center;
+}
+.modal-icon{font-size:43px;margin-bottom:17px}
+.modal-card h2{color:var(--cyan);font-size:22px;margin-bottom:15px}
+.modal-card p{color:#a8b6cc;font-size:13px;line-height:1.8}
+.support{
+display:block;
+margin-top:20px;
+padding:14px;
+background:#168b60;
+color:white;
+text-decoration:none;
+border-radius:9px;
+font-size:12px;
+font-weight:800;
+}
+.close{
+width:100%;
+padding:13px;
+background:#273750;
+border:0;
+color:white;
+border-radius:9px;
+margin-top:11px;
+}
+
+@media(max-width:800px){
+.stats{grid-template-columns:1fr}
+.content{grid-template-columns:1fr}
+.container{padding:25px 15px}
+header{padding:0 15px}
+.welcome h1{font-size:22px}
+}
+@media(max-width:450px){
+.auth-card{padding:25px}
+.profile{display:none}
+.modules{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<section class="auth" id="auth">
+<div class="auth-card">
+
+<div class="logo">CLIENTZONE</div>
+<div class="logo-sub">FINANCIAL CLIENT PORTAL</div>
+
+<h2 id="formTitle">Welcome Back</h2>
+<p class="desc" id="formDesc">Sign in to your Clientzone account.</p>
+
+<div id="nameField" class="hidden">
+<label>Full Name</label>
+<input id="fullName" placeholder="Your full name">
+</div>
+
+<label>Email Address</label>
+<input id="email" type="email" placeholder="example@email.com" autocomplete="email">
+
+<label>Password</label>
+<input id="password" type="password" placeholder="Minimum 8 characters">
+
+<div class="error" id="error"></div>
+
+<button class="primary" id="submitBtn" onclick="submitAuth()">SIGN IN</button>
+
+<div class="switch" id="switch" onclick="toggleMode()">
+Don't have an account? Create one
+</div>
+
+<div class="note">CLIENTZONE • </div>
+</div>
+</section>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+<header>
+<div class="logo">CLIENTZONE</div>
+<div class="header-right">
+<div class="profile">CLIENT ID: 10261881</div>
+<button class="logout" onclick="logout()">LOG OUT</button>
+</div>
+</header>
+
+<main class="container">
+
+<div class="welcome">
+<div>
+<h1>Dashboard Overview</h1>
+<p>Welcome to your Clientzone financial portal.</p>
+
+<div class="client-id">
+<small>YOUR CLIENT ID</small>
+<strong>10261881</strong>
+</div>
+</div>
+<div class="account-status">● ACCOUNT</div>
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-label">Invested Capital</div>
+<div class="stat-value cyan">€200.00</div>
+<div class="stat-info">value</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">Total Capital</div>
+<div class="stat-value">BTC 0.23091.00</div>
+<div class="stat-info">value</div>
+</div>
+
+<div class="stat">
+<div class="stat-label">Account Status</div>
+<div class="stat-value purple" style="font-size:23px">Restricted</div>
+<div class="stat-info">account status</div>
+</div>
+
+</div>
+
+<div class="actions">
+<button class="action deposit" onclick="restriction('Deposit')">
+＋ DEPOSIT
+</button>
+<button class="action withdraw" onclick="restriction('Withdraw')">
+－ WITHDRAW
+</button>
+</div>
+
+<div class="content">
+
+<section class="panel">
+<h3>Portfolio Performance</h3>
+<div class="chart-area">
+<canvas id="chart"></canvas>
+</div>
+</section>
+
+<section class="panel">
+<h3>Investment Services</h3>
+
+<div class="modules">
+
+<div class="module">
+<div class="module-icon">🤖</div>
+<h4>Trading Robot</h4>
+<p>Automated trading system.</p>
+<span class="inactive">NOT ACTIVE</span>
+</div>
+
+<div class="module">
+<div class="module-icon">📊</div>
+<h4> PAMM</h4>
+<p>Portfolio management system.</p>
+<span class="inactive">NOT ACTIVE</span>
+</div>
+
+</div>
+</section>
+
+</div>
+
+<section class="panel" style="margin-top:22px">
+<h3>Recent Transactions</h3>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>TYPE</th>
+<th>DATE</th>
+<th>AMOUNT</th>
+<th>STATUS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Investment</td>
+<td>19/06/2025</td>
+<td>€200</td>
+<td class="sample">Active</td>
+</tr>
+<tr>
+<td>Investment</td>
+<td>Real</td>
+<td>€0</td>
+<td class="sample">Active</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+<!-- OPERAZIONI EFFETTUATE -->
+<section class="panel" style="margin-top:22px">
+    <h3>Operazioni Effettuate</h3>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>N.</th>
+                    <th>DATA</th>
+                    <th>OPERAZIONE</th>
+                    <th>PROFITTO</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>08/11/2025</td>
+                    <td>Forex – EUR/USD</td>
+                    <td class="sample">+22,50 €</td>
+                </tr>
+
+                <tr>
+                    <td>2</td>
+                    <td>17/11/2025</td>
+                    <td>Gold – XAU/USD</td>
+                    <td class="sample">+31,00 €</td>
+                </tr>
+
+                <tr>
+                    <td>3</td>
+                    <td>29/11/2025</td>
+                    <td>Oil – Crude Oil</td>
+                    <td class="sample">+18,50 €</td>
+                </tr>
+
+                <tr>
+                    <td>4</td>
+                    <td>06/12/2025</td>
+                    <td>Forex – GBP/USD</td>
+                    <td class="sample">+35,00 €</td>
+                </tr>
+
+                <tr>
+                    <td>5</td>
+                    <td>11/12/2025</td>
+                    <td>Gold – XAU/USD</td>
+                    <td class="sample">+28,00 €</td>
+                </tr>
+
+                <tr>
+                    <td>6</td>
+                    <td>16/12/2025</td>
+                    <td>Indices – NASDAQ</td>
+                    <td class="sample">+38,00 €</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+</main>
+
+<footer>
+
+</main>
+
+<footer>
+ClientZone è una società specializzata nell'assistenza e nella gestione delle pratiche dei clienti che hanno concluso il proprio rapporto con società di trading oppure che provengono da società che hanno cessato la propria attività.
+
+Attraverso la collaborazione con le società partner, le pratiche dei clienti vengono affidate al nostro team, che si occupa di fornire assistenza e coordinare le procedure necessarie per il prelievo del capitale ancora presente sui rispettivi conti.
+
+Il nostro obiettivo è garantire continuità nell'assistenza, comunicazione trasparente e supporto professionale, accompagnando ogni cliente durante tutte le fasi della procedura di prelievo del capitale.
+
+ClientZone – Al tuo fianco nel processo di prelievo del capitale.
+INFORMAZIONI SULLA SOCIETÀCLIENTZONE LIMITED è una società regolarmente registrata in Inghilterra e Galles.
+Ragione sociale: CLIENTZONE LIMITED Numero di registrazione: 06090078
+Sede legale: Rutland House, Minerva Business Park, Peterborough, PE2 6PZ, Regno Unito.
+</footer>
+</div>
+
+<!-- RESTRICTION POPUP -->
+<div class="modal" id="modal">
+<div class="modal-card">
+<div class="modal-icon">🔒</div>
+<h2>Account Restricted</h2>
+<p id="modalText">This account is restricted
+<p style="margin-top:12px">
+Please contact support for assistance.
+This process is real financial transactions.
+</p>
+
+<a class="support" href="https://wa.me/393780098750" target="_blank">
+CONTACT SUPPORT ON WHATSAPP
+</a>
+
+<button class="close" onclick="closeModal()">CLOSE</button>
+</div>
+</div>
+
+<script>
+let signup=false;
+
+function toggleMode(){
+signup=!signup;
+
+document.getElementById("nameField").classList.toggle("hidden",!signup);
+document.getElementById("formTitle").textContent=signup?"Create Account":"Welcome Back";
+document.getElementById("formDesc").textContent=signup?
+"Create your Clientzoneprofile.":
+"Sign in to your Clientzone account.";
+document.getElementById("submitBtn").textContent=signup?"CREATE ACCOUNT":"SIGN IN";
+document.getElementById("switch").textContent=signup?
+"Already registered? Sign in":
+"Don't have an account? Create one";
+document.getElementById("error").textContent="";
+}
+
+function submitAuth(){
+const email=document.getElementById("email").value.trim();
+const password=document.getElementById("password").value;
+const name=document.getElementById("fullName").value.trim();
+const error=document.getElementById("error");
+
+error.textContent="";
+
+const emailPattern=/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+
+if(!emailPattern.test(email)){
+error.textContent="Please enter a valid email address.";
+return;
+}
+
+if(password.length<8){
+error.textContent="Password must have at least 8 characters.";
+return;
+}
+
+if(signup){
+if(name.length<2){
+error.textContent="Please enter your full name.";
+return;
+}
+error.textContent=".Secure account creation requires backend verification.";
+return;
+}
+
+document.getElementById("auth").classList.add("hidden");
+document.getElementById("dashboard").classList.remove("hidden");
+
+createChart();
+}
+
+function logout(){
+document.getElementById("dashboard").classList.add("hidden");
+document.getElementById("auth").classList.remove("hidden");
+}
+
+function restriction(type){
+document.getElementById("modalText").textContent=
+type+" is currently unavailable because this account is restricted.";
+document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
+}
+
+function createChart(){
+const ctx=document.getElementById("chart");
+
+if(window.myChart)window.myChart.destroy();
+
+window.myChart=new Chart(ctx,{
+type:"line",
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun","Jul"],
+datasets:[{
+label:"Capital",
+data:[12000,14500,16000,18000,17500,22000,25000],
+borderColor:"#35d5e8",
+backgroundColor:"rgba(53,213,232,.10)",
+fill:true,
+tension:.4,
+pointRadius:3,
+pointBackgroundColor:"#947aff"
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{labels:{color:"#aab8ce"}}
+},
+scales:{
+x:{ticks:{color:"#8b9ab2"},grid:{color:"#293954"}},
+y:{ticks:{color:"#8b9ab2"},grid:{color:"#293954"}}
+}
+}
+});
+}
+</script>
+
+</body>
+</html>
